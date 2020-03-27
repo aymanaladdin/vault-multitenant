@@ -1,0 +1,43 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+    - master
+
+
+jobs:
+  publish:
+    name: npm-publish
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install node v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: npm install
+    - run: npm i -g typescript
+    - run: npm run build
+    - name: Publish if version has been updated
+      uses: JS-DevTools/npm-publish@v1
+      with:
+        token: ${{ secrets.NPM_AUTH_TOKEN }}
+  # coverage:
+  #   name: coverage
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v1
+  #   - name: install node v12
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: 12
+  #   - run: npm install
+  #   - run: npm i -g nyc typescript
+  #   - run: tsc
+  #   - run: npm run test-cov
+  #   - name: Coveralls
+  #     uses: coverallsapp/github-action@master
+  #     with:
+  #       github-token: ${{ secrets.GITHUB_TOKEN }}
+  #       path-to-lcov: ./coverage/lcov.info

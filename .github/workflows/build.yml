@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+    branches:
+    - master
+    - develop
+    - 'feature/**'
+    - 'enhancement/**'
+    - 'hostfix/**'
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install node v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: npm install
+    - run: npm i -g nyc typescript
+    - run: tsc
+    - run: npm test
+    # - run: npm run test-cov
