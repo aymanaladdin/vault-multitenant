@@ -7,7 +7,7 @@ import { IVaultErrorHandler, IVaultAuthInfoParser } from '../interfaces';
 
 
 @Provider()
-export class JWTLogin {
+export class VaultJWTLogin {
 
   private vaultService: VaultService;
   private errorHandler: IVaultErrorHandler;
