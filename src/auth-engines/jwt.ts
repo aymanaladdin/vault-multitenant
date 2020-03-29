@@ -1,12 +1,13 @@
+import request from 'request-promise-native';
 import { Provider, IGuardContext } from '@bluemax/core';
 import { Response } from 'express';
-import { VaultService } from './vault.service';
-import { VaultMultitenant } from './vault';
-import { IVaultErrorHandler, IVaultAuthInfoParser, IVaultAuthInfo } from './interfaces';
+import { VaultService } from '../vault.service';
+import { VaultMultitenant } from '../vault';
+import { IVaultErrorHandler, IVaultAuthInfoParser } from '../interfaces';
 
 
 @Provider()
-export class VaultLogin {
+export class JWTLogin {
 
   private vaultService: VaultService;
   private errorHandler: IVaultErrorHandler;
@@ -34,9 +35,24 @@ export class VaultLogin {
 
 
     // TODO: handle vault errors
-    const tokenInfo = await this.vaultService.login(authInfo.authEngineName, authInfo.token, role);
-    req.vault = tokenInfo;
+    const tokenInfo = await this.login(authInfo.authEngineName, authInfo.token, role);
+    req.vault = tokenInfo.auth;
 
     return true;
+  }
+
+  private async login(secretEngineName: string, token: string, role: string) {
+    return request({
+      method: 'POST',
+      uri: `${this.vaultService.hostname}/v1/auth/${secretEngineName}/login`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        role,
+        jwt: token
+      },
+      json: true
+    });
   }
 }

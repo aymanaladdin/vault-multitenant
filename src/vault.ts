@@ -1,6 +1,8 @@
 import { IAppExtension, ICustomProvider, BxApp } from '@bluemax/core';
 import { IVaultExtOptions, IVaultErrorHandler, IVaultAuthInfoParser, IVaultAuthInfo } from './interfaces';
 import { VaultService } from './vault.service';
+import { AWSSecretEngine } from './secret-engines';
+import { DBSecretEngine } from './secret-engines/database';
 
 
 export class VaultMultitenant implements IAppExtension {
@@ -16,10 +18,20 @@ export class VaultMultitenant implements IAppExtension {
     this.errorHandling = options.errorHandling || this.defaultErrorHandler;
     this.getAuthInfo = options.getAuthInfo || this.defaultAuthInfoParser;
 
-    this.globalProviders = [{
-      provider: VaultMultitenant,
-      use: this
-    }];
+    this.globalProviders = [
+      {
+        provider: VaultMultitenant,
+        use: this
+      },
+      {
+        provider: AWSSecretEngine,
+        use: new AWSSecretEngine(this.vaultService)
+      },
+      {
+        provider: DBSecretEngine,
+        use: new DBSecretEngine(this.vaultService)
+      }
+    ];
   }
 
   private defaultErrorHandler(error: Error) {
