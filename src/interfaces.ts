@@ -23,3 +23,19 @@ export interface IVaultAuthInfo {
 export interface IVaultAuthInfoParser {
   (req: Request): IVaultAuthInfo;
 }
+
+export interface IVaultAuth {
+  client_token: string;
+  accessor: string;
+  policies: string[];
+  token_policies: string[];
+  metadata: {
+    role: string;
+    [key: string]: string;
+  };
+  lease_duration: number;
+  renewable: boolean;
+  entity_id: string;
+  token_type: string;
+  orphan: boolean;
+}
