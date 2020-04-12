@@ -9,7 +9,7 @@ export class KVSecretEngine {
     this.vaultService = vaultService;
   }
 
-  async generateCreds(options: IKVGetSecretsOptions): Promise<IKVGetSecretsResponse> {
+  async generateCreds<T = IKVGetSecretsResponse>(options: IKVGetSecretsOptions): Promise<T> {
     const result = await request({
       method: 'GET',
       uri: `${this.vaultService.hostname}/v1/${options.path}`,
