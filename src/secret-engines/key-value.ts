@@ -1,6 +1,6 @@
 import request from 'request-promise-native';
 import { VaultService } from '../vault.service';
-import { IKVGetSecretsOptions, IKVGetSecretsResponse } from './interfaces';
+import { IKVGetSecretOptions, IKVGetSecretResponse } from './interfaces';
 
 export class KVSecretEngine {
   private vaultService: VaultService;
@@ -9,7 +9,7 @@ export class KVSecretEngine {
     this.vaultService = vaultService;
   }
 
-  async generateCreds<T = IKVGetSecretsResponse>(options: IKVGetSecretsOptions): Promise<T> {
+  async getSecret<T = IKVGetSecretResponse>(options: IKVGetSecretOptions): Promise<T> {
     const result = await request({
       method: 'GET',
       uri: `${this.vaultService.hostname}/v1/${options.path}`,

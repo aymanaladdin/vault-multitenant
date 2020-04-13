@@ -23,11 +23,11 @@ export interface IDBGenerateTokenResponse {
   password: string;
 }
 
-export interface IKVGetSecretsOptions {
+export interface IKVGetSecretOptions {
   path: string;
   token: string;
 }
 
-export interface IKVGetSecretsResponse {
+export interface IKVGetSecretResponse {
   [key: string]: string;
 }
