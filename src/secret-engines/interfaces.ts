@@ -22,3 +22,12 @@ export interface IDBGenerateTokenResponse {
   username: string;
   password: string;
 }
+
+export interface IKVGetSecretOptions {
+  path: string;
+  token: string;
+}
+
+export interface IKVGetSecretResponse {
+  [key: string]: string;
+}
