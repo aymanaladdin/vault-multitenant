@@ -1,9 +1,9 @@
 import request from 'request-promise-native';
 import { Provider, IGuardContext } from '@bluemax/core';
 import { Response } from 'express';
-import { VaultService } from '../vault.service';
-import { VaultMultitenant } from '../vault';
-import { IVaultErrorHandler, IVaultAuthInfoParser } from '../interfaces';
+import { VaultService } from '../../vault.service';
+import { VaultMultitenant } from '../../vault';
+import { IVaultErrorHandler, IVaultAuthInfoParser } from '../../interfaces';
 
 
 @Provider()
