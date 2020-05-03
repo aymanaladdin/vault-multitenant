@@ -31,3 +31,7 @@ export interface IKVGetSecretOptions {
 export interface IKVGetSecretResponse {
   [key: string]: string;
 }
+
+export interface IKVData {
+  [key: string]: any;
+}
