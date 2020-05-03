@@ -2,6 +2,7 @@ import { IAppExtension, ICustomProvider, BxApp } from '@bluemax/core';
 import { IVaultExtOptions, IVaultErrorHandler, IVaultAuthInfoParser, IVaultAuthInfo } from './interfaces';
 import { VaultService } from './vault.service';
 import { AWSSecretEngine, KVSecretEngine, DBSecretEngine } from './secret-engines';
+import { AppRoleAuthEngine } from './auth-engines';
 
 export class VaultMultitenant implements IAppExtension {
 
@@ -32,6 +33,10 @@ export class VaultMultitenant implements IAppExtension {
       {
         provider: KVSecretEngine,
         use: new KVSecretEngine(this.vaultService)
+      },
+      {
+        provider: AppRoleAuthEngine,
+        use: new AppRoleAuthEngine(this.vaultService)
       }
     ];
   }
