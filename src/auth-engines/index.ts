@@ -1,2 +1,2 @@
-export * from './guards/jwt';
+export * from './jwt.guard';
 export * from './app-role';
