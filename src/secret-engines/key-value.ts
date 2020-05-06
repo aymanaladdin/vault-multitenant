@@ -44,4 +44,17 @@ export class KVSecretEngine {
       json: true
     });
   }
+
+  async listSecretKeys(options: IKVGetSecretOptions): Promise<string[]> {
+    const result = await request({
+      method: 'LIST',
+      uri: `${this.vaultService.hostname}/v1/${options.path}`,
+      headers: {
+        'X-Vault-Token': options.token
+      },
+      json: true
+    });
+
+    return result.data?.keys;
+  }
 }
