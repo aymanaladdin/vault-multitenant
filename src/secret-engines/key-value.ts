@@ -9,35 +9,35 @@ export class KVSecretEngine {
     this.vaultService = vaultService;
   }
 
-  async getSecret<T = IKVGetSecretResponse>(options: IKVGetSecretOptions): Promise<T> {
+  async getSecret<T = IKVGetSecretResponse>(options: IKVGetSecretOptions, secretKey: string, version: number = 1): Promise<T> {
     const result = await request({
       method: 'GET',
-      uri: `${this.vaultService.hostname}/v1/${options.path}`,
+      uri: `${this.vaultService.hostname}/v1/${options.engineName}/data/${secretKey}?version=${version}`,
       headers: {
         'X-Vault-Token': options.token
       },
       json: true
     });
 
-    return result.data;
+    return result.data?.data;
   }
 
-  async createSecret(options: IKVGetSecretOptions, data: IKVData): Promise<void> {
+  async createSecret(options: IKVGetSecretOptions, secretKey: string, data: IKVData, cas: number = 0): Promise<void> {
     await request({
       method: 'POST',
-      uri: `${this.vaultService.hostname}/v1/${options.path}`,
+      uri: `${this.vaultService.hostname}/v1/${options.engineName}/data/${secretKey}`,
       headers: {
         'X-Vault-Token': options.token
       },
       json: true,
-      body: data
+      body: { data, options: { cas } }
     });
   }
 
-  async deleteSecret(options: IKVGetSecretOptions): Promise<void> {
+  async deleteSecret(options: IKVGetSecretOptions, secretKey: string): Promise<void> {
     await request({
       method: 'DELETE',
-      uri: `${this.vaultService.hostname}/v1/${options.path}`,
+      uri: `${this.vaultService.hostname}/v1/${options.engineName}/metadata/${secretKey}`,
       headers: {
         'X-Vault-Token': options.token
       },
@@ -45,10 +45,10 @@ export class KVSecretEngine {
     });
   }
 
-  async listSecretKeys(options: IKVGetSecretOptions): Promise<string[]> {
+  async listSecretKeys(options: IKVGetSecretOptions, path?: string): Promise<string[]> {
     const result = await request({
       method: 'LIST',
-      uri: `${this.vaultService.hostname}/v1/${options.path}`,
+      uri: `${this.vaultService.hostname}/v1/${options.engineName}/metadata/${path ? path : ''}`,
       headers: {
         'X-Vault-Token': options.token
       },
