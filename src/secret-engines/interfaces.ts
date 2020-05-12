@@ -24,7 +24,7 @@ export interface IDBGenerateTokenResponse {
 }
 
 export interface IKVGetSecretOptions {
-  path: string;
+  engineName: string;
   token: string;
 }
 
