@@ -20,7 +20,7 @@ export class AWSSecretEngine {
       },
       json: true,
       body: {
-        ttl: options.ttl || 3600,
+        ttl: options.ttl || '3600s',
         role_arn: options.role_arn || undefined
       }
     });
