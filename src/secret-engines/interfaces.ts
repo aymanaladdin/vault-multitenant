@@ -2,7 +2,7 @@ export interface IAWSGenerateTokenOptions {
   engineName: string;
   token: string;
   roleName: string;
-  ttl?: number;
+  ttl?: string;
   role_arn?: string;
 }
 
