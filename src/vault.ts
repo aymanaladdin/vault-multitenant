@@ -1,7 +1,7 @@
 import { IAppExtension, ICustomProvider, BxApp } from '@bluemax/core';
 import { IVaultExtOptions, IVaultErrorHandler, IVaultAuthInfoParser, IVaultAuthInfo } from './interfaces';
 import { VaultService } from './vault.service';
-import { AWSSecretEngine, KVSecretEngine, DBSecretEngine } from './secret-engines';
+import { AWSSecretEngine, KVSecretEngine, DBSecretEngine, CachingUtils } from './secret-engines';
 import { AppRoleAuthEngine } from './auth-engines/app-role';
 
 export class VaultMultitenant implements IAppExtension {
@@ -17,6 +17,17 @@ export class VaultMultitenant implements IAppExtension {
     this.errorHandling = options.errorHandling || this.defaultErrorHandler;
     this.getAuthInfo = options.getAuthInfo || this.defaultAuthInfoParser;
 
+    const awsSecretEngine = new AWSSecretEngine(this.vaultService);
+    const dbSecretEngine = new DBSecretEngine(this.vaultService);
+    const kvSecretEngine = new KVSecretEngine(this.vaultService);
+    const appRoleAuthEngine = new AppRoleAuthEngine(this.vaultService);
+
+    const cachingWrapper = new CachingUtils({
+      awsSecretEngine,
+      dbSecretEngine,
+      kvSecretEngine
+    });
+
     this.globalProviders = [
       {
         provider: VaultMultitenant,
@@ -24,19 +35,23 @@ export class VaultMultitenant implements IAppExtension {
       },
       {
         provider: AWSSecretEngine,
-        use: new AWSSecretEngine(this.vaultService)
+        use: awsSecretEngine
       },
       {
         provider: DBSecretEngine,
-        use: new DBSecretEngine(this.vaultService)
+        use: dbSecretEngine
       },
       {
         provider: KVSecretEngine,
-        use: new KVSecretEngine(this.vaultService)
+        use: kvSecretEngine
       },
       {
         provider: AppRoleAuthEngine,
-        use: new AppRoleAuthEngine(this.vaultService)
+        use: appRoleAuthEngine
+      },
+      {
+        provider: CachingUtils,
+        use: cachingWrapper
       }
     ];
   }

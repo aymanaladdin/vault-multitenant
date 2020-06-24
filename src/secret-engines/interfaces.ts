@@ -1,3 +1,7 @@
+import { DBSecretEngine } from './database';
+import { AWSSecretEngine } from './aws';
+import { KVSecretEngine } from './key-value';
+
 export interface IAWSGenerateTokenOptions {
   engineName: string;
   token: string;
@@ -34,4 +38,27 @@ export interface IKVGetSecretResponse {
 
 export interface IKVData {
   [key: string]: any;
+}
+
+export interface ICachingUtilsOptions {
+  awsSecretEngine: AWSSecretEngine;
+  dbSecretEngine: DBSecretEngine;
+  kvSecretEngine: KVSecretEngine;
+}
+
+export interface IAWSGetTokenOptions extends IAWSGenerateTokenOptions {
+  cacheEngineName: string;
+  cachePath: string;
+  cachettl: number;
+}
+
+export interface IDBGetTokenOptions extends IDBGenerateTokenOptions {
+  cacheEngineName: string;
+  cachePath: string;
+  cachettl: number;
+}
+
+export interface ICachedCreds {
+  exp: number;
+  data: any;
 }
