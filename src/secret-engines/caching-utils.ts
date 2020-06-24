@@ -32,6 +32,7 @@ export class CachingUtils {
   }
 
   private getExpiry(secs: number) {
+    // TODO: check if we need math.floor
     return (new Date().getTime() + (secs * 1000)) / 1000;
   }
 
