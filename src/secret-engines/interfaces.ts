@@ -2,6 +2,11 @@ import { DBSecretEngine } from './database';
 import { AWSSecretEngine } from './aws';
 import { KVSecretEngine } from './key-value';
 
+export enum KvEngineVersion {
+  v1 = 'v1',
+  v2 = 'v2'
+}
+
 export interface IAWSGenerateTokenOptions {
   engineName: string;
   token: string;
@@ -30,6 +35,7 @@ export interface IDBGenerateTokenResponse {
 export interface IKVGetSecretOptions {
   engineName: string;
   token: string;
+  engineVersion: KvEngineVersion;
 }
 
 export interface IKVGetSecretResponse {

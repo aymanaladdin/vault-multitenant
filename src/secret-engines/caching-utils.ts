@@ -4,7 +4,8 @@ import {
   IAWSGetTokenOptions,
   IDBGetTokenOptions,
   ICachingUtilsOptions,
-  ICachedCreds
+  ICachedCreds,
+  KvEngineVersion
 } from './interfaces';
 
 
@@ -13,22 +14,26 @@ export class CachingUtils {
   constructor(private options: ICachingUtilsOptions) { }
 
   private async getCachedCreds(cacheEngineName: string, cachePath: string, token: string) {
-    const creds = await this.options.kvSecretEngine.getSecret<ICachedCreds>({ engineName: cacheEngineName, token }, cachePath);
-    return creds && this.checkExpiry(creds.exp) ? creds.data : null;
+    const opts = { engineName: cacheEngineName, token, engineVersion: KvEngineVersion.v1 };
+    let creds;
+
+    try {
+      creds = await this.options.kvSecretEngine.getSecret<ICachedCreds>(opts, cachePath);
+
+      return creds && this.checkExpiry(creds.exp) ? creds.data : null;
+    }
+
+    catch (err) {
+      if (err.statusCode === 404) return null;
+
+      throw err;
+    }
   }
 
   private async setCachedCreds(cacheEngineName: string, cachePath: string, token: string, ttl: number, data: any) {
-    await this.options.kvSecretEngine.createSecret(
-      {
-        engineName: cacheEngineName,
-        token
-      },
-      cachePath,
-      {
-        exp: this.getExpiry(ttl),
-        data
-      }
-    );
+    const opts = { engineName: cacheEngineName, token, engineVersion: KvEngineVersion.v1 };
+
+    await this.options.kvSecretEngine.createSecret(opts, cachePath, { exp: this.getExpiry(ttl), data });
   }
 
   private getExpiry(secs: number) {

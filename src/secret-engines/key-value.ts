@@ -1,6 +1,6 @@
 import request from 'request-promise-native';
 import { VaultService } from '../vault.service';
-import { IKVGetSecretOptions, IKVGetSecretResponse, IKVData } from './interfaces';
+import { IKVGetSecretOptions, IKVGetSecretResponse, IKVData, KvEngineVersion } from './interfaces';
 
 export class KVSecretEngine {
   private vaultService: VaultService;
@@ -10,34 +10,46 @@ export class KVSecretEngine {
   }
 
   async getSecret<T = IKVGetSecretResponse>(options: IKVGetSecretOptions, secretKey: string, version: number = 1): Promise<T> {
+    const baseUri = `${this.vaultService.hostname}/v1/${options.engineName}`;
+    const uri = (options.engineVersion === KvEngineVersion.v1) ?
+      `${baseUri}/${secretKey}` : `${baseUri}/data/${secretKey}?version=${version}`;
+
     const result = await request({
       method: 'GET',
-      uri: `${this.vaultService.hostname}/v1/${options.engineName}/data/${secretKey}?version=${version}`,
+      uri,
       headers: {
         'X-Vault-Token': options.token
       },
       json: true
     });
 
-    return result.data?.data;
+    return (options.engineVersion === KvEngineVersion.v1) ? result.data : result.data?.data;
   }
 
   async createSecret(options: IKVGetSecretOptions, secretKey: string, data: IKVData, cas: number = 0): Promise<void> {
+    const baseUri = `${this.vaultService.hostname}/v1/${options.engineName}`;
+    const uri = (options.engineVersion === KvEngineVersion.v1) ? `${baseUri}/${secretKey}` : `${baseUri}/data/${secretKey}`;
+
+    const body = (options.engineVersion === KvEngineVersion.v1) ? data : { data, options: { cas } };
+
     await request({
       method: 'POST',
-      uri: `${this.vaultService.hostname}/v1/${options.engineName}/data/${secretKey}`,
+      uri,
       headers: {
         'X-Vault-Token': options.token
       },
       json: true,
-      body: { data, options: { cas } }
+      body
     });
   }
 
   async deleteSecret(options: IKVGetSecretOptions, secretKey: string): Promise<void> {
+    const baseUri = `${this.vaultService.hostname}/v1/${options.engineName}`;
+    const uri = (options.engineVersion === KvEngineVersion.v1) ? `${baseUri}/${secretKey}` : `${baseUri}/metadata/${secretKey}`;
+
     await request({
       method: 'DELETE',
-      uri: `${this.vaultService.hostname}/v1/${options.engineName}/metadata/${secretKey}`,
+      uri,
       headers: {
         'X-Vault-Token': options.token
       },
@@ -46,9 +58,12 @@ export class KVSecretEngine {
   }
 
   async listSecretKeys(options: IKVGetSecretOptions, path?: string): Promise<string[]> {
+    const baseUri = `${this.vaultService.hostname}/v1/${options.engineName}`;
+    const uri = (options.engineVersion === KvEngineVersion.v1) ? `${baseUri}/${path}` : `${baseUri}/metadata/${path}`;
+
     const result = await request({
       method: 'LIST',
-      uri: `${this.vaultService.hostname}/v1/${options.engineName}/metadata/${path ? path : ''}`,
+      uri,
       headers: {
         'X-Vault-Token': options.token
       },
